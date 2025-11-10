@@ -31,7 +31,7 @@ const Index = () => {
               <div className="flex items-center gap-3">
                 <Shield className="h-8 w-8 text-primary" />
                 <div>
-                  <h1 className="text-2xl font-bold text-foreground">Government Payroll System</h1>
+                  <h1 className="text-2xl font-bold text-foreground">Government PayRoll System</h1>
                   <p className="text-sm text-muted-foreground">Official Employee Portal</p>
                 </div>
               </div>
@@ -59,7 +59,7 @@ const Index = () => {
           <div className="flex items-center gap-3">
             <Shield className="h-8 w-8 text-primary" />
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Government Payroll System</h1>
+              <h1 className="text-2xl font-bold text-foreground">Government PayRoll System</h1>
               <p className="text-sm text-muted-foreground">Secure Employee Management Portal</p>
             </div>
           </div>
@@ -158,7 +158,7 @@ const Index = () => {
 
       <footer className="mt-16 border-t border-border bg-card py-6">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2024 Government Payroll System. All rights reserved.</p>
+          <p>© 2024 Government PayRoll System. All rights reserved.</p>
           <p className="mt-1">Official Government Employee Portal</p>
         </div>
       </footer>
