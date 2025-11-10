@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calculator, DollarSign, FileText, Shield } from "lucide-react";
+import { Calculator, DollarSign, Lock, LogOut, Shield } from "lucide-react";
 import PayrollForm from "@/components/PayrollForm";
 import PayrollStatus from "@/components/PayrollStatus";
+import { toast } from "sonner";
 
 export interface PayrollData {
   employeeName: string;
@@ -15,12 +18,53 @@ export interface PayrollData {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [showCalculator, setShowCalculator] = useState(false);
   const [payrollData, setPayrollData] = useState<PayrollData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setLoading(false);
+      }
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (!session) {
+        navigate("/auth");
+      } else {
+        setLoading(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   const handlePayrollSubmit = (data: PayrollData) => {
     setPayrollData(data);
   };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out successfully");
+    navigate("/auth");
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="h-12 w-12 text-primary mx-auto mb-4 animate-pulse" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (showCalculator) {
     return (
@@ -35,9 +79,15 @@ const Index = () => {
                   <p className="text-sm text-muted-foreground">Official Employee Portal</p>
                 </div>
               </div>
-              <Button variant="outline" onClick={() => setShowCalculator(false)}>
-                Back to Home
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setShowCalculator(false)}>
+                  Back to Home
+                </Button>
+                <Button variant="ghost" onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
             </div>
           </div>
         </header>
@@ -56,12 +106,18 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-background to-gov-light">
       <header className="border-b border-border bg-card/80 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <Shield className="h-8 w-8 text-primary" />
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Government PayRoll System</h1>
-              <p className="text-sm text-muted-foreground">Secure Employee Management Portal</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Shield className="h-8 w-8 text-primary" />
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">Government PayRoll System</h1>
+                <p className="text-sm text-muted-foreground">Secure Employee Management Portal</p>
+              </div>
             </div>
+            <Button variant="ghost" onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Sign Out
+            </Button>
           </div>
         </div>
       </header>
@@ -82,7 +138,10 @@ const Index = () => {
         </section>
 
         <section className="grid gap-6 md:grid-cols-3">
-          <Card className="transition-shadow hover:shadow-lg">
+          <Card 
+            className="transition-shadow hover:shadow-lg cursor-pointer hover:border-primary/50"
+            onClick={() => navigate("/salary-management")}
+          >
             <CardHeader>
               <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                 <DollarSign className="h-6 w-6 text-primary" />
@@ -94,10 +153,13 @@ const Index = () => {
             </CardHeader>
           </Card>
 
-          <Card className="transition-shadow hover:shadow-lg">
+          <Card 
+            className="transition-shadow hover:shadow-lg cursor-pointer hover:border-primary/50"
+            onClick={() => navigate("/tax-calculations")}
+          >
             <CardHeader>
               <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-accent/10">
-                <FileText className="h-6 w-6 text-accent" />
+                <Calculator className="h-6 w-6 text-accent" />
               </div>
               <CardTitle>Tax Calculations</CardTitle>
               <CardDescription>
@@ -106,10 +168,13 @@ const Index = () => {
             </CardHeader>
           </Card>
 
-          <Card className="transition-shadow hover:shadow-lg">
+          <Card 
+            className="transition-shadow hover:shadow-lg cursor-pointer hover:border-primary/50"
+            onClick={() => navigate("/secure-access")}
+          >
             <CardHeader>
               <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-secondary/10">
-                <Shield className="h-6 w-6 text-secondary" />
+                <Lock className="h-6 w-6 text-secondary" />
               </div>
               <CardTitle>Secure Access</CardTitle>
               <CardDescription>
